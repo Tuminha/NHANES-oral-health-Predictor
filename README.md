@@ -70,12 +70,16 @@ A single, end-to-end notebook that demonstrates:
 ## 📊 Dataset / Domain
 
 - **Source:** NHANES (CDC National Health and Nutrition Examination Survey)
-- **Cycle:** 2017-2018 (adjustable)
-- **Components:**
-  - **DEMO:** Demographics (age, sex, race/ethnicity, education, income-to-poverty ratio)
-  - **OHQ:** Oral Health Questionnaire (last dental visit question)
+- **Dataset Format:** CSV files from Kaggle (easier to work with than SAS XPT)
+- **Files Used:**
+  - `demographic.csv` (10,175 rows, 47 columns) - Demographics
+  - `questionnaire.csv` (10,175 rows, 953 columns) - All questionnaire responses
 - **Target:** Binary classification - visited dentist ≤ 12 months (derived from `OHQ030`)
-- **Features:** Categorical (sex, race/ethnicity, education) + Numeric (age, income ratio)
+  - `OHQ030` codes: 1 = <6 months, 2 = 6-12 months → **target = 1**
+  - All other valid responses → **target = 0**
+- **Features Selected:**
+  - Categorical: `RIAGENDR` (sex), `RIDRETH3` (race/ethnicity), `DMDEDUC2` (education)
+  - Numeric: `RIDAGEYR` (age), `INDFMPIR` (income-to-poverty ratio)
 
 ---
 
@@ -125,17 +129,19 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 
 ### Sections:
 
-1. **Setup and brand style** - Load Periospot palette, configure matplotlib
-2. **Get the data** - Load NHANES DEMO and OHQ XPT files
-3. **Clean and EDA** - Handle missingness, basic visualizations
-4. **Train/test split** - Stratified 80/20 split
-5. **CatBoost baseline** - Native categorical handling
-6. **XGBoost baseline** - One-hot encoding pipeline
-7. **LightGBM baseline** (optional) - Third comparison
-8. **Threshold policy** - Find optimal threshold for policy decisions
-9. **SHAP explanations** - Interpretability with TreeExplainer
-10. **Compare and save** - Model comparison, artifact saving
-11. **Model card** - Documentation template
+1. ✅ **Setup and brand style** - Load Periospot palette, configure matplotlib
+2. ✅ **Get the data** - Load NHANES CSV files (demographic.csv + questionnaire.csv)
+3. 🚧 **Clean and EDA** - Handle missingness, basic visualizations
+4. ⏳ **Train/test split** - Stratified 80/20 split
+5. ⏳ **CatBoost baseline** - Native categorical handling
+6. ⏳ **XGBoost baseline** - One-hot encoding pipeline
+7. ⏳ **LightGBM baseline** (optional) - Third comparison
+8. ⏳ **Threshold policy** - Find optimal threshold for policy decisions
+9. ⏳ **SHAP explanations** - Interpretability with TreeExplainer
+10. ⏳ **Compare and save** - Model comparison, artifact saving
+11. ⏳ **Model card** - Documentation template
+
+**Legend:** ✅ Completed | 🚧 In Progress | ⏳ Pending
 
 ---
 
@@ -148,6 +154,41 @@ Final test metrics will include:
 - ROC-AUC
 - Precision and Recall at optimal threshold
 - SHAP feature importance plots
+
+---
+
+## 📈 Project Progress
+
+### ✅ Completed
+
+- [x] **Project structure** - Folder organization, brand palette JSON, README
+- [x] **Section 0: Setup** - Brand palette loading, matplotlib configuration, folder creation
+- [x] **Section 1: Data Loading** - Successfully loaded NHANES data from CSV files
+  - Fixed CSV loading (Kaggle dataset uses CSV, not SAS XPT)
+  - Loaded `demographic.csv` (10,175 rows, 47 columns)
+  - Loaded `questionnaire.csv` (10,175 rows, 953 columns)
+  - Merged datasets on `SEQN` (participant ID)
+  - Built binary target from `OHQ030` (visited dentist ≤ 12 months)
+  - Target class balance: ~63% visited within 12 months
+
+### 🚧 In Progress
+
+- [ ] **Section 2: EDA and Cleaning** - Handle missing values, create visualizations
+
+### 📋 Upcoming
+
+- [ ] **Section 3-6:** Model training (CatBoost, XGBoost, LightGBM)
+- [ ] **Section 7-8:** Threshold policy and SHAP explanations
+- [ ] **Section 9-10:** Model comparison and artifacts
+
+### 📊 Current Dataset Stats
+
+- **Total participants:** 10,175
+- **Features selected:**
+  - Categorical: `RIAGENDR` (sex), `RIDRETH3` (race/ethnicity), `DMDEDUC2` (education)
+  - Numeric: `RIDAGEYR` (age), `INDFMPIR` (income-to-poverty ratio)
+- **Target:** Binary (visited dentist in last 12 months: Yes/No)
+- **Target distribution:** To be confirmed after filtering
 
 ---
 
