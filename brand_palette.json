@@ -1,0 +1,18 @@
+{
+  "colors": {
+    "periospot_blue": "#15365a",
+    "mystic_blue": "#003049",
+    "periospot_red": "#6c1410",
+    "crimson_blaze": "#a92a2a",
+    "vanilla_cream": "#f7f0da",
+    "black": "#000000",
+    "white": "#ffffff"
+  },
+  "matplotlib": {
+    "font_family": "DejaVu Sans",
+    "title_size": 16,
+    "label_size": 12,
+    "tick_size": 10
+  }
+}
+
