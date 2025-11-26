@@ -131,7 +131,7 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 
 1. ✅ **Setup and brand style** - Load Periospot palette, configure matplotlib
 2. ✅ **Get the data** - Load NHANES CSV files (demographic.csv + questionnaire.csv)
-3. 🚧 **Clean and EDA** - Handle missingness, basic visualizations
+3. ✅ **Clean and EDA** - Handle missingness, basic visualizations
 4. ⏳ **Train/test split** - Stratified 80/20 split
 5. ⏳ **CatBoost baseline** - Native categorical handling
 6. ⏳ **XGBoost baseline** - One-hot encoding pipeline
@@ -142,6 +142,87 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 11. ⏳ **Model card** - Documentation template
 
 **Legend:** ✅ Completed | 🚧 In Progress | ⏳ Pending
+
+---
+
+## 📊 Exploratory Data Analysis
+
+### Data Distribution Overview
+
+After loading and merging the NHANES datasets, we performed initial exploratory analysis to understand the target distribution and key demographic patterns. Here are the key findings:
+
+#### 1. Class Balance
+
+The dataset shows a moderate class imbalance:
+
+<div align="center">
+
+<img src="images/class_balance.png" alt="Class Balance - Distribution of target variable" width="680" />
+
+</div>
+
+**Key Findings:**
+- **No Visit (>12 months):** ~6,100 instances (~63%)
+- **Visited (≤12 months):** ~3,600 instances (~37%)
+- **Imbalance Ratio:** ~1.7:1
+
+This moderate imbalance suggests we should consider:
+- Class weights during model training
+- PR-AUC as a primary metric (better for imbalanced data than ROC-AUC)
+- Threshold tuning to optimize recall/precision trade-off
+
+#### 2. Target Rate by Age Group
+
+Age is a strong predictor of dental visit frequency:
+
+<div align="center">
+
+<img src="images/target_rate_by_age.png" alt="Target Rate by Age Group" width="680" />
+
+</div>
+
+**Key Findings:**
+- **<18 years:** Highest target rate at ~73% - Young adults/teens most likely to visit
+- **18-35 years:** Lowest target rate at ~51% - Drop likely due to life transitions, less parental oversight
+- **35-50 years:** ~56% - Gradual recovery as people establish routines
+- **50-65 years:** ~57% - Continued improvement
+- **65+ years:** ~59% - Highest among adults, likely due to insurance and health awareness
+
+**Insights:**
+- Strong age effect - model should capture this well
+- Non-linear relationship suggests tree-based models (CatBoost/XGBoost) will excel
+- Younger cohort (<18) may have different visit patterns due to family dynamics
+
+#### 3. Target Rate by Sex
+
+Sex shows a slight but noticeable difference:
+
+<div align="center">
+
+<img src="images/target_rate_by_sex.png" alt="Target Rate by Sex" width="680" />
+
+</div>
+
+**Key Findings:**
+- **Female:** ~64-65% target rate
+- **Male:** ~60% target rate
+- **Difference:** ~4-5 percentage points
+
+**Insights:**
+- Females slightly more likely to visit dentists regularly
+- This pattern aligns with general healthcare-seeking behavior differences
+- Sex should be included as a categorical feature
+
+### Data Cleaning Summary
+
+- **Missing Value Handling:**
+  - Numeric features (`RIDAGEYR`, `INDFMPIR`): Imputed with median
+  - Categorical features (`RIAGENDR`, `RIDRETH3`, `DMDEDUC2`): Imputed with most frequent mode
+- **Target Filtering:**
+  - Excluded invalid responses (refused: 77, don't know: 99, missing: NaN)
+  - Kept only valid responses (codes 1-7)
+- **Final Dataset:**
+  - Ready for train/test split and modeling
 
 ---
 
@@ -169,11 +250,17 @@ Final test metrics will include:
   - Loaded `questionnaire.csv` (10,175 rows, 953 columns)
   - Merged datasets on `SEQN` (participant ID)
   - Built binary target from `OHQ030` (visited dentist ≤ 12 months)
-  - Target class balance: ~63% visited within 12 months
+  - Target class balance: ~63% no visit, ~37% visited (moderate imbalance)
+- [x] **Section 2: EDA and Cleaning** - Exploratory data analysis completed
+  - Handled missing values (median for numeric, mode for categorical)
+  - Created visualizations: class balance, target rate by age group, target rate by sex
+  - Key insights: Strong age effect (youngest highest at 73%, 18-35 lowest at 51%)
+  - Sex shows slight difference (females ~65%, males ~60%)
+  - Identified moderate class imbalance requiring appropriate metrics
 
 ### 🚧 In Progress
 
-- [ ] **Section 2: EDA and Cleaning** - Handle missing values, create visualizations
+- [ ] **Section 3: Train/Test Split** - Stratified 80/20 split for model training
 
 ### 📋 Upcoming
 
@@ -183,12 +270,18 @@ Final test metrics will include:
 
 ### 📊 Current Dataset Stats
 
-- **Total participants:** 10,175
+- **Total participants:** ~9,760 (after filtering invalid responses)
 - **Features selected:**
   - Categorical: `RIAGENDR` (sex), `RIDRETH3` (race/ethnicity), `DMDEDUC2` (education)
   - Numeric: `RIDAGEYR` (age), `INDFMPIR` (income-to-poverty ratio)
 - **Target:** Binary (visited dentist in last 12 months: Yes/No)
-- **Target distribution:** To be confirmed after filtering
+- **Target distribution:** 
+  - No visit (>12 months): ~6,100 (63%)
+  - Visited (≤12 months): ~3,600 (37%)
+  - **Imbalance ratio:** 1.7:1
+- **Key Patterns:**
+  - Age is strongest predictor (73% for <18, 51% for 18-35)
+  - Females slightly more likely to visit (65% vs 60%)
 
 ---
 
