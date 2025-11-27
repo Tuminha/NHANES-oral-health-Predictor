@@ -132,7 +132,7 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 1. ✅ **Setup and brand style** - Load Periospot palette, configure matplotlib
 2. ✅ **Get the data** - Load NHANES CSV files (demographic.csv + questionnaire.csv)
 3. ✅ **Clean and EDA** - Handle missingness, basic visualizations
-4. ⏳ **Train/test split** - Stratified 80/20 split
+4. ✅ **Train/test split** - Stratified 80/20 split
 5. ⏳ **CatBoost baseline** - Native categorical handling
 6. ⏳ **XGBoost baseline** - One-hot encoding pipeline
 7. ⏳ **LightGBM baseline** (optional) - Third comparison
@@ -258,9 +258,15 @@ Final test metrics will include:
   - Sex shows slight difference (females ~65%, males ~60%)
   - Identified moderate class imbalance requiring appropriate metrics
 
+- [x] **Section 3: Train/Test Split** - Stratified 80/20 split completed
+  - Used `train_test_split` with `stratify=y` to maintain class distribution
+  - 80% training set, 20% test set
+  - Class distribution preserved in both splits
+  - Random seed set to 42 for reproducibility
+
 ### 🚧 In Progress
 
-- [ ] **Section 3: Train/Test Split** - Stratified 80/20 split for model training
+- [ ] **Section 4: CatBoost Baseline** - Train first model with native categorical handling
 
 ### 📋 Upcoming
 
