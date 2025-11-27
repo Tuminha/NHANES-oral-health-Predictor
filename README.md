@@ -270,7 +270,7 @@ Final test metrics will include:
 
 ### 📋 Upcoming
 
-- [ ] **Section 3-6:** Model training (CatBoost, XGBoost, LightGBM)
+- [ ] **Section 4-6:** Model training (CatBoost, XGBoost, LightGBM)
 - [ ] **Section 7-8:** Threshold policy and SHAP explanations
 - [ ] **Section 9-10:** Model comparison and artifacts
 
