@@ -41,6 +41,10 @@ artifacts/*.pkl
 artifacts/*.h5
 artifacts/*.pb
 
+# CatBoost training logs
+**/catboost_info/
+*.tsv
+
 # IDE
 .vscode/
 .idea/
