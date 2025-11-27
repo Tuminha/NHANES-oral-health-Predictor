@@ -133,6 +133,7 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 2. ✅ **Get the data** - Load NHANES CSV files (demographic.csv + questionnaire.csv)
 3. ✅ **Clean and EDA** - Handle missingness, basic visualizations
 4. ✅ **Train/test split** - Stratified 80/20 split
+5. ✅ **CatBoost baseline** - First model trained with native categorical handling
 5. ⏳ **CatBoost baseline** - Native categorical handling
 6. ⏳ **XGBoost baseline** - One-hot encoding pipeline
 7. ⏳ **LightGBM baseline** (optional) - Third comparison
@@ -228,13 +229,29 @@ Sex shows a slight but noticeable difference:
 
 ## 🏆 Results
 
-*Results will appear here after running the notebook.*
+### CatBoost Baseline Model (Section 4)
 
-Final test metrics will include:
-- PR-AUC (average precision)
-- ROC-AUC
-- Precision and Recall at optimal threshold
-- SHAP feature importance plots
+**Training Details:**
+- Categorical features: Converted to string format (RIAGENDR, RIDRETH3, DMDEDUC2)
+- Early stopping: Triggered at iteration 289 (best model)
+- Training stopped: After 100 iterations without improvement (prevents overfitting)
+
+**Test Performance:**
+- **PR-AUC: 0.8422** (84.22%) - Excellent! ✅
+- **ROC-AUC: 0.7711** (77.11%) - Good! ✅
+
+**Interpretation:**
+- PR-AUC of 0.84 indicates strong ability to identify people who visited dentists
+- ROC-AUC of 0.77 shows good overall discriminative power
+- PR-AUC > ROC-AUC is expected for imbalanced datasets (focuses on minority class)
+
+**Next Steps:**
+- Compare with XGBoost baseline
+- Compare with LightGBM (optional)
+- Optimize threshold for policy decisions
+- Generate SHAP explanations for interpretability
+
+📚 **See [CATBOOST_EXPLANATION.md](CATBOOST_EXPLANATION.md) for detailed step-by-step explanation of the training output.**
 
 ---
 
@@ -264,9 +281,15 @@ Final test metrics will include:
   - Class distribution preserved in both splits
   - Random seed set to 42 for reproducibility
 
+- [x] **Section 4: CatBoost Baseline** - First model trained successfully
+  - Converted categorical features to string format (CatBoost requirement)
+  - Trained with PR-AUC optimization and early stopping
+  - Early stopping triggered at iteration 289 (best model)
+  - Results: PR-AUC = 0.8422, ROC-AUC = 0.7711
+
 ### 🚧 In Progress
 
-- [ ] **Section 4: CatBoost Baseline** - Train first model with native categorical handling
+- [ ] **Section 5: XGBoost Baseline** - Train second model with one-hot encoding for comparison
 
 ### 📋 Upcoming
 
