@@ -1,0 +1,33 @@
+{
+  "best_model": "XGBoost",
+  "all_models": {
+    "CatBoost": {
+      "pr_auc": 0.8421509088903071,
+      "roc_auc": 0.7711444381796758
+    },
+    "XGBoost": {
+      "pr_auc": 0.8441918126874383,
+      "roc_auc": 0.7691969204348124
+    },
+    "LightGBM": {
+      "pr_auc": 0.8420683893891203,
+      "roc_auc": 0.7698716022539662
+    }
+  },
+  "best_model_metrics": {
+    "pr_auc": 0.8441918126874383,
+    "roc_auc": 0.7691969204348124
+  },
+  "threshold_policy": {
+    "threshold": 0.09404549518523647,
+    "precision_at_threshold": 0.6296106557377049,
+    "recall_at_threshold": 1.0,
+    "f1_at_threshold": 0.7727129833385727
+  },
+  "dataset": {
+    "test_size": 1952,
+    "train_size": 7805,
+    "target_rate_train": 0.6294682895579756,
+    "target_rate_test": 0.6296106557377049
+  }
+}
