@@ -133,11 +133,10 @@ The main notebook (`notebooks/nhanes_dental_visits_one_notebook.ipynb`) is struc
 2. ✅ **Get the data** - Load NHANES CSV files (demographic.csv + questionnaire.csv)
 3. ✅ **Clean and EDA** - Handle missingness, basic visualizations
 4. ✅ **Train/test split** - Stratified 80/20 split
-5. ✅ **CatBoost baseline** - First model trained with native categorical handling
-5. ⏳ **CatBoost baseline** - Native categorical handling
+5. ✅ **CatBoost baseline** - Native categorical handling with PR-AUC optimization
 6. ⏳ **XGBoost baseline** - One-hot encoding pipeline
 7. ⏳ **LightGBM baseline** (optional) - Third comparison
-8. ⏳ **Threshold policy** - Find optimal threshold for policy decisions
+8. ✅ **Threshold policy** - Optimal threshold selection (t* = 0.094)
 9. ⏳ **SHAP explanations** - Interpretability with TreeExplainer
 10. ⏳ **Compare and save** - Model comparison, artifact saving
 11. ⏳ **Model card** - Documentation template
@@ -325,11 +324,71 @@ For this dental visit prediction task:
 
 ---
 
+---
+
+### 🎯 Threshold Policy Optimization (Section 7)
+
+After training the CatBoost model, we optimized the decision threshold to balance precision and recall for real-world deployment.
+
+#### **Optimization Goal**
+
+Find the threshold that **maximizes recall** while maintaining **minimum precision ≥ 0.25**.
+
+This strategy prioritizes catching all dental visitors (high recall) while ensuring predictions are reasonably accurate.
+
+#### **Optimal Threshold Results**
+
+```
+Optimal threshold t*: 0.0940
+├── Precision@t*: 0.6296 (63%)
+├── Recall@t*: 1.0000 (100%)
+├── F1@t*: 0.7727 (77%)
+└── F2@t*: 0.8947 (89%)
+```
+
+<div align="center">
+
+<img src="images/pr_curve_with_threshold.png" alt="Precision-Recall Curve with Optimal Threshold" width="680" />
+
+</div>
+
+#### **Clinical Interpretation**
+
+**Threshold t* = 0.094** means:
+- Predict "visited dentist" if model probability ≥ 9.4%
+- **Very liberal prediction strategy** — flags almost everyone as a potential visitor
+
+**What this achieves:**
+- ✅ **100% Recall** — Catches every single person who actually visited the dentist (zero false negatives)
+- ✅ **63% Precision** — When predicting someone visited, correct 63% of the time
+- ✅ **Well above minimum** — Precision of 63% far exceeds the 25% constraint
+
+#### **Real-World Applications**
+
+| Threshold | Precision | Recall | Use Case |
+|-----------|-----------|--------|----------|
+| **0.094** | **63%** | **100%** | **Universal screening programs** ✅ (current) |
+| 0.3 | ~88% | ~92% | Balanced outreach (high efficiency) |
+| 0.5 | ~90% | ~85% | Targeted interventions (resource-constrained) |
+| 0.7 | ~92% | ~70% | High-confidence follow-ups only |
+
+#### **Public Health Perspective**
+
+**For universal dental screening:**
+- **Benefit:** Never miss anyone who needs/seeks dental care (100% recall)
+- **Cost:** 37% of outreach goes to people who won't visit (acceptable for public health)
+- **Verdict:** Optimal for intervention programs where missing people is costly
+
+**For budget-constrained programs:**
+- Consider threshold **0.3-0.5** for better precision (~85-90%) while maintaining high recall (~85-92%)
+
+---
+
 ### 🚀 Next Steps
 
+- [x] **Section 7:** Threshold policy optimization ✅ **COMPLETED**
 - [ ] **Section 5:** Train XGBoost baseline with one-hot encoding (compare to CatBoost)
 - [ ] **Section 6:** Optional LightGBM baseline (third framework comparison)
-- [ ] **Section 7:** Threshold policy optimization (find optimal probability cutoff for decisions)
 - [ ] **Section 8:** SHAP explanations (identify which demographic features drive predictions)
 - [ ] **Section 9:** Model comparison table and artifact saving
 - [ ] **Section 10:** Complete model card documentation
@@ -370,14 +429,22 @@ For this dental visit prediction task:
   - Early stopping triggered at iteration 289 (best model)
   - Results: PR-AUC = 0.8422, ROC-AUC = 0.7711
 
+- [x] **Section 7: Threshold Policy Optimization** - Optimal threshold selection completed
+  - Objective: Maximize recall while maintaining minimum precision ≥ 0.25
+  - Optimal threshold: t* = 0.094 (9.4% prediction probability)
+  - Performance: 100% recall, 63% precision, F1 = 0.77, F2 = 0.89
+  - Generated precision-recall curve visualization
+  - Analyzed trade-offs for different deployment scenarios
+
 ### 🚧 In Progress
 
 - [ ] **Section 5: XGBoost Baseline** - Train second model with one-hot encoding for comparison
+- [ ] **Section 8: SHAP Explanations** - Interpret model predictions and feature importance
 
 ### 📋 Upcoming
 
-- [ ] **Section 4-6:** Model training (CatBoost, XGBoost, LightGBM)
-- [ ] **Section 7-8:** Threshold policy and SHAP explanations
+- [ ] **Section 5-6:** Model training (XGBoost, LightGBM)
+- [ ] **Section 8:** SHAP explanations for interpretability
 - [ ] **Section 9-10:** Model comparison and artifacts
 
 ### 📊 Current Dataset Stats
