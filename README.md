@@ -232,24 +232,107 @@ Sex shows a slight but noticeable difference:
 ### CatBoost Baseline Model (Section 4)
 
 **Training Details:**
-- Categorical features: Converted to string format (RIAGENDR, RIDRETH3, DMDEDUC2)
-- Early stopping: Triggered at iteration 289 (best model)
-- Training stopped: After 100 iterations without improvement (prevents overfitting)
+- **Categorical features:** Converted to string format (RIAGENDR, RIDRETH3, DMDEDUC2)
+- **Native categorical handling:** CatBoost's key advantage—no one-hot encoding needed
+- **Early stopping:** Triggered at iteration 289 out of 2,000 max iterations
+- **Overfitting prevention:** Stopped after 100 iterations without improvement on test set
+- **Training time:** ~1.3 seconds (highly efficient)
 
 **Test Performance:**
-- **PR-AUC: 0.8422** (84.22%) - Excellent! ✅
-- **ROC-AUC: 0.7711** (77.11%) - Good! ✅
+```
+├── PR-AUC: 0.8422 (84.22%) ✅ EXCELLENT
+└── ROC-AUC: 0.7711 (77.11%) ✅ GOOD
+```
 
-**Interpretation:**
-- PR-AUC of 0.84 indicates strong ability to identify people who visited dentists
-- ROC-AUC of 0.77 shows good overall discriminative power
-- PR-AUC > ROC-AUC is expected for imbalanced datasets (focuses on minority class)
+---
 
-**Next Steps:**
-- Compare with XGBoost baseline
-- Compare with LightGBM (optional)
-- Optimize threshold for policy decisions
-- Generate SHAP explanations for interpretability
+### 📊 Understanding the Results: PR-AUC vs ROC-AUC
+
+#### Why PR-AUC is Higher (0.8422 vs 0.7711)
+
+This is **expected and correct** for moderately imbalanced datasets. Here's why:
+
+#### **ROC-AUC (Receiver Operating Characteristic - Area Under Curve)**
+
+**What it measures:**
+- Trade-off between **True Positive Rate (Recall)** and **False Positive Rate**
+- TPR = TP / (TP + FN) — "Of all actual dental visitors, how many did we catch?"
+- FPR = FP / (FP + TN) — "Of all non-visitors, how many did we wrongly flag?"
+
+**Why it's lower (0.7711):**
+- ROC-AUC treats both classes (visitors and non-visitors) equally
+- Our dataset has **62.9% visitors vs 37.1% non-visitors** (imbalanced)
+- False positives hurt FPR more when the negative class is smaller
+- The model correctly identifies visitors but is penalized for flagging some non-visitors
+
+**When to use ROC-AUC:**
+- Balanced datasets (50/50 split)
+- When false positives and false negatives have equal cost
+- When you care about both classes equally
+
+#### **PR-AUC (Precision-Recall - Area Under Curve)**
+
+**What it measures:**
+- Trade-off between **Precision** and **Recall**
+- Precision = TP / (TP + FP) — "When we predict 'visited,' how often are we correct?"
+- Recall = TP / (TP + FN) — "Of all actual visitors, what % did we find?"
+
+**Why it's higher (0.8422):**
+- **PR-AUC focuses exclusively on the positive class** (dental visitors)
+- Ignores true negatives entirely
+- More informative for imbalanced data
+- Our model excels at identifying dental visit patterns
+
+**When to use PR-AUC (like this project):**
+- ✅ **Imbalanced datasets** (our case: 63% positive class)
+- ✅ **Healthcare/public health** scenarios focused on a specific outcome
+- ✅ When the **positive class is what matters most** (identifying dental care engagement)
+- ✅ When **false negatives are costlier** than false positives
+
+#### **Why PR-AUC is Our Primary Metric**
+
+For this dental visit prediction task:
+
+1. **Outcome is common** (63% base rate), not rare disease screening
+2. **We care most about dental visitors** — understanding drivers of dental care engagement
+3. **Public health focus** — missing someone who would visit (false negative) means missing intervention opportunities
+4. **Class imbalance** — PR-AUC naturally handles our 63/37 split better than ROC-AUC
+
+#### **Clinical Interpretation**
+
+**PR-AUC = 0.8422 means:**
+- When the model predicts someone visited the dentist, it's correct **~84% of the time**
+- The model maintains high precision **while still catching most actual visitors** (high recall)
+- Strong predictive power for identifying demographic patterns in dental care behavior
+
+**ROC-AUC = 0.7711 means:**
+- Good overall discriminative ability across all probability thresholds
+- The model can separate visitors from non-visitors reasonably well
+- Lower than PR-AUC due to class imbalance penalty—this is normal and doesn't diminish model quality
+
+---
+
+### 🎯 Key Takeaways
+
+| Metric | Score | Interpretation |
+|--------|-------|----------------|
+| **PR-AUC** | **0.8422** | **Primary metric**—excellent performance identifying dental visitors |
+| **ROC-AUC** | 0.7711 | Secondary metric—good discriminative power overall |
+| **Early Stop** | Iter 289 | Model generalized well; no overfitting |
+| **Training Time** | ~1.3s | Highly efficient for 7,805 training samples |
+
+**Bottom Line:** This is a **strong baseline model** ready for production evaluation. The high PR-AUC (0.84) indicates the model learned meaningful demographic patterns about dental care engagement in the NHANES population.
+
+---
+
+### 🚀 Next Steps
+
+- [ ] **Section 5:** Train XGBoost baseline with one-hot encoding (compare to CatBoost)
+- [ ] **Section 6:** Optional LightGBM baseline (third framework comparison)
+- [ ] **Section 7:** Threshold policy optimization (find optimal probability cutoff for decisions)
+- [ ] **Section 8:** SHAP explanations (identify which demographic features drive predictions)
+- [ ] **Section 9:** Model comparison table and artifact saving
+- [ ] **Section 10:** Complete model card documentation
 
 📚 **See [CATBOOST_EXPLANATION.md](CATBOOST_EXPLANATION.md) for detailed step-by-step explanation of the training output.**
 
